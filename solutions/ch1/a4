@@ -1,0 +1,59 @@
+#!/usr/bin/env python
+import struct
+import sys
+from collections import OrderedDict
+
+
+OPS = {
+    # '<op_name>': (op_id, has_argument)
+    'push': (0x1, True),
+    'pop': (0x2, False),
+    'sum': (0x3, False),
+    'sumx': (0x4, False),
+    'pcall': (0x5, True),
+    'call': (0x6, True),
+    'ret': (0x7, False),
+}
+
+WORD_FMT = 'H'
+
+routines = OrderedDict()
+
+current_routine_id = 0
+while True:
+    try:
+        line = raw_input().strip()
+    except (KeyboardInterrupt, EOFError):
+        break
+
+    if line.startswith('routine'):
+        current_routine_id = int(line.split()[1])
+        routines[current_routine_id] = []
+
+    tokens = line.split()
+    if tokens and tokens[0].lower() in OPS:
+        op, has_argument = OPS[tokens[0].lower()]
+        routines[current_routine_id].append(op)
+        if has_argument:
+            routines[current_routine_id].append(int(tokens[1]))
+        else:
+            # there should always exist an operand
+            routines[current_routine_id].append(0x0)
+
+
+# header
+sys.stdout.write(
+    struct.pack(WORD_FMT, len(routines)))
+ip = 0
+for routine_id, instructions in routines.items():
+    sys.stdout.write(
+        struct.pack(WORD_FMT, routine_id))
+    sys.stdout.write(
+        struct.pack(WORD_FMT, ip))
+    ip += len(instructions) / 2
+
+# body
+for routine_instructions in routines.values():
+    for instruction in routine_instructions:
+        sys.stdout.write(
+        struct.pack(WORD_FMT, instruction))
