@@ -1,0 +1,6 @@
+push 65
+push 1
+pcall 255
+push 66
+push 1
+pcall 255
