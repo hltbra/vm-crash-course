@@ -1,5 +1,6 @@
 #include <fcntl.h>
 #include <stdio.h>
+#include <stdint.h>
 #include <unistd.h>
 
 #define PUSH 0x1
@@ -7,22 +8,21 @@
 #define SUM 0x3
 #define SUMX 0x4
 
-#define STACK_MAX_SIZE 10000
+#define MAX_STACK_SIZE 10000
+#define MAX_PROGRAM_SIZE 100000
 
-
-typedef unsigned char t_word;
 
 typedef struct {
     int i;
-    t_word stack[STACK_MAX_SIZE];
+    uint8_t stack[MAX_STACK_SIZE];
 } t_stack;
 
 
-void push(t_stack *s, t_word value) {
+void push(t_stack *s, uint8_t value) {
     s->stack[s->i++] = value;
 }
 
-int pop(t_stack *s) {
+uint8_t pop(t_stack *s) {
     return s->stack[--s->i];
 }
 
@@ -31,15 +31,13 @@ void init_stack(t_stack *s) {
 }
 
 void sum(t_stack *s) {
-    t_word x, y;
-    x = pop(s);
-    y = pop(s);
-    push(s, x + y);
+    uint8_t x, y;
+    push(s, pop(s) + pop(s));
 }
 
 void sumx(t_stack *s) {
-    t_word sum = 0;
-    t_word len = pop(s);
+    uint8_t sum = 0;
+    uint8_t len = pop(s);
     for (int i = 0 ; i < len; i++) {
         sum += pop(s);
     }
@@ -59,26 +57,32 @@ void dump(t_stack *s) {
 }
 
 int main(int argc, char *argv[]) {
-    t_word token, value;
-    t_stack s;
-    init_stack(&s);
-
     if (argc < 2) {
         printf("ERROR: missing input file!\n");
         return 1;
     }
-    int fd = open(argv[1], O_RDONLY);
+    t_stack s;
+    init_stack(&s);
 
-    while (read(fd, &token, sizeof(t_word)) > 0) {
-        // there always exist an operand
-        read(fd, &value, sizeof(t_word));
-        if (token == PUSH) {
-            push(&s, value);
-        } else if (token == POP) {
+    uint16_t program[MAX_PROGRAM_SIZE], instruction;
+
+    int fd = open(argv[1], O_RDONLY);
+    int i = 0;
+    while (read(fd, &instruction, 2) > 0) {
+        program[i++] = instruction;
+    }
+    // indicates end of program
+    program[i] = 0;
+
+    for (uint16_t *ip = program ; *ip != 0 ; ip++) {
+        uint8_t instruction = (uint8_t)*ip;
+        if (instruction == PUSH) {
+            push(&s, *((uint8_t *)ip + 1));
+        } else if (instruction == POP) {
             pop(&s);
-        } else if (token == SUM) {
+        } else if (instruction == SUM) {
             sum(&s);
-        } else if (token == SUMX) {
+        } else if (instruction == SUMX) {
             sumx(&s);
         }
     }
