@@ -13,21 +13,21 @@
 
 
 typedef struct {
-    int i;
+    int sp;
     uint8_t stack[MAX_STACK_SIZE];
 } t_stack;
 
 
 void push(t_stack *s, uint8_t value) {
-    s->stack[s->i++] = value;
+    s->stack[s->sp++] = value;
 }
 
 uint8_t pop(t_stack *s) {
-    return s->stack[--s->i];
+    return s->stack[--s->sp];
 }
 
 void init_stack(t_stack *s) {
-    s->i = 0;
+    s->sp = 0;
 }
 
 void sum(t_stack *s) {
@@ -47,9 +47,9 @@ void sumx(t_stack *s) {
 
 void dump(t_stack *s) {
     printf("[");
-    for (int i = 0 ; i < s->i ; i++) {
+    for (int i = 0 ; i < s->sp ; i++) {
         printf("%d", s->stack[i]);
-        if (i < (s->i - 1)) {
+        if (i < (s->sp - 1)) {
             printf(", ");
         }
     }
