@@ -1,0 +1,15 @@
+routine 1 { //  x + y
+  push_arg 0
+  push_arg 1
+  sum
+  ret
+}
+
+routine 0 { // print(1(62, 3))
+  push 62
+  push 3
+  call 1
+  push 1
+  pcall 255
+  ret
+}

@@ -1,0 +1,6 @@
+routine 0 { // print(7()+10)
+  push 65
+  push 1
+  pcall 255
+  ret
+}
