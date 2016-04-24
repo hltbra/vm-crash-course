@@ -60,7 +60,7 @@ The activation record format should be: `[... prog_data, args, FP, ret_addr, pro
 - `ret_addr` is a pointer to the next instruction of the call site.
 - `prog_data` is all data a subroutine pushes to operate on.
 
-For example, consider the following code containing a call to some subroutine `X` (as in `X(10, 20)`):
+For example, consider the following code containing a call to some subroutine `X` (as in `X(10, 20)`) and assume routine X executes `PUSH_ARG 0` and `PUSH_ARG 1`:
 
 ```
 0xA: PUSH 10
