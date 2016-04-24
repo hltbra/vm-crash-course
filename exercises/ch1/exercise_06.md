@@ -72,17 +72,17 @@ is just a collection of subroutines whose instructions are per line. Example
 of source code:
 
 ```
-routine 7 { //  1+2
-   push 1
-   push 2
+routine 7 { //  x + y
+   push_arg 0
+   push_arg 1
    sum
    ret
 }
 
-routine 0 { // print(7()+10)
+routine 0 { // print(7(3, 10) )
   push 10
+  push 3
   call 7
-  sum
   push 1
   pcall 255
   ret
@@ -95,15 +95,15 @@ Assembled, the source code above should generate the following object file:
 
 ```
 //header
-0x0: 0x9  //main_addr
+0x0: 0x9     //main_addr
 //body
-0x1:  1 1    //push 1  -- begin subroutine 7
-0x3:  1 2    //push 2
+0x1:  8 0    //push_arg 0  -- begin subroutine 7
+0x3:  8 1    //push_arg 1
 0x5:  3 0    //sum
 0x7:  7 0    //ret
 0x9:  1 10   //push 10 -- begin subroutine 0
-0xB:  6 0x1  //call 0x1 -- calls subroutine 7
-0xD:  3 0    //sum
+0xB:  1 3    //push 3
+0xD:  6 0x1  //call 0x1 -- calls subroutine 7
 0xF:  1 1    //push 1
 0x11: 5 255  //pcall 255
 0x13: 7 0    //ret
